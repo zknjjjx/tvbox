@@ -1,0 +1,31 @@
+name: Collect CMS sources
+
+on:
+  schedule:
+    - cron: '30 19 * * *'   # 每天 03:30 北京时间
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['scripts/collect.py', '.github/workflows/collect.yml']
+
+permissions:
+  contents: write
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install aiohttp==3.10.11
+      - run: python scripts/collect.py
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898299+github-actions[bot]@users.noreply.github.com"
+          git add cmstv.json tvbox.json
+          if git diff --cached --quiet; then echo "无变化"; exit 0; fi
+          git commit -m "chore: 更新公共接口 $(date -u +%F)"
+          git push
