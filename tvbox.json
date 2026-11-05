@@ -55,15 +55,6 @@
    "filterable": 1
   },
   {
-   "key": "cn_e80270d8",
-   "name": "bhziyuan.com",
-   "type": 1,
-   "api": "https://bhziyuan.com/api.php/provide/vod/",
-   "searchable": 1,
-   "quickSearch": 1,
-   "filterable": 1
-  },
-  {
    "key": "cn_5ad70943",
    "name": "caiji.dbzy5.com",
    "type": 1,

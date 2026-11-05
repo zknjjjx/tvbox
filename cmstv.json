@@ -1,7 +1,7 @@
 {
  "name": "CineNest 公共接口",
  "format": "cmstv/1",
- "updated": "2026-11-05 15:54 UTC",
+ "updated": "2026-11-05 15:55 UTC",
  "count": 123,
  "note": "未验活，由 CineNest 在本地测速并自动跳过不通的源",
  "sites": [
@@ -43,13 +43,6 @@
   {
    "name": "api.1080zyku.com",
    "api": "http://api.1080zyku.com/inc/api.php/provide/vod",
-   "adult": false,
-   "first": "2026-11-05",
-   "seen": "2026-11-05"
-  },
-  {
-   "name": "bhziyuan.com",
-   "api": "https://bhziyuan.com/api.php/provide/vod",
    "adult": false,
    "first": "2026-11-05",
    "seen": "2026-11-05"
@@ -666,6 +659,13 @@
   {
    "name": "beiyong.slapibf.com",
    "api": "https://beiyong.slapibf.com/api.php/provide/vod",
+   "adult": true,
+   "first": "2026-11-05",
+   "seen": "2026-11-05"
+  },
+  {
+   "name": "bhziyuan.com",
+   "api": "https://bhziyuan.com/api.php/provide/vod",
    "adult": true,
    "first": "2026-11-05",
    "seen": "2026-11-05"
