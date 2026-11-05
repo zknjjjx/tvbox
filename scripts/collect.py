@@ -116,17 +116,21 @@ async def main():
     found = {}
     for api, name in SEEDS.items():
         found.setdefault(key_of(api), {"api": api.rstrip("/"), "name": name})
-    stats = {}
+    stats, hot = {}, {}
+    for api in SEEDS:
+        hot[key_of(api)] = 1  # 知名老站起步 +1
     async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as session:
         texts = await asyncio.gather(*[fetch(session, u) for u in UPSTREAMS], return_exceptions=True)
     for u, text in zip(UPSTREAMS, texts):
         if isinstance(text, Exception):
             stats[u] = "error: " + type(text).__name__
             continue
-        n = 0
+        n, seen_here = 0, set()
         for m in API_RE.finditer(text):
             api = m.group(0).rstrip("/")
             k = key_of(api)
+            if k not in seen_here:
+                seen_here.add(k); hot[k] = hot.get(k, 0) + 1  # 人气：被多少个上游收录
             lb, rb = text.rfind("{", 0, m.start()), text.find("}", m.end())
             name = ""
             if lb != -1 and rb != -1 and rb - lb < 600 and "{" not in text[m.end():rb]:
@@ -142,7 +146,7 @@ async def main():
     for k, s in found.items():
         old = prev.get(k, {})
         sites[k] = {"name": old.get("name") if old.get("name") and old["name"] != urlparse(s["api"]).hostname else s["name"],
-                    "api": s["api"], "adult": adult_hint(s["name"], s["api"]), "first": old.get("first", today), "seen": today}
+                    "api": s["api"], "adult": adult_hint(s["name"], s["api"]), "first": old.get("first", today), "seen": today, "hot": hot.get(k, 0)}
     async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False, limit=30)) as session:
         sem = asyncio.Semaphore(20)
         ks = list(sites)
@@ -157,7 +161,8 @@ async def main():
         if k not in sites and s.get("seen", today) >= cutoff:
             sites[k] = s
     # 同名不同站：加域名区分
-    lst = sorted(sites.values(), key=lambda s: (s["adult"], s["first"], s["name"]))
+    # 按人气排序：被收录的上游越多越靠前
+    lst = sorted(sites.values(), key=lambda s: (s["adult"], -s.get("hot", 0), s["first"], s["name"]))
     cnt = {}
     for s in lst:
         cnt[s["name"]] = cnt.get(s["name"], 0) + 1
@@ -166,7 +171,7 @@ async def main():
             s["name"] = f'{s["name"]}·{(urlparse(s["api"]).hostname or "").removeprefix("www.").split(".")[0]}'
     cms = {"name": "CineNest 公共接口", "format": "cmstv/1",
            "updated": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
-           "count": len(lst), "note": "未验活，由 CineNest 在本地测速并自动跳过不通的源",
+           "count": len(lst), "note": "未验活，按人气（被多少个上游收录）排序；播放时自动跳过不通的源",
            "sites": lst}
     tvb = {"sites": [{"key": "cn_" + hashlib.md5(s["api"].encode()).hexdigest()[:8], "name": s["name"], "type": 1,
                       "api": s["api"] + "/", "searchable": 1, "quickSearch": 1, "filterable": 1}
