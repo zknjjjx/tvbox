@@ -1,11 +1,13 @@
 {
- "spider": "https://xiuxiu-pro-new.meitudata.com/posters/8057468f8f30ba79c6dbbeb7fc1a052e.jpg;md5;b3fb6f369726e9c688dd5a7ad017d0dd",
- "wallpaper": "https://cdn.jsdelivr.net/gh/zknjjjx/tvbox@main/assets/wallpaper.jpg",
+ "name": "妞妞",
+ "notice": "妞妞 · 297 个站点 · 每日更新 2026-11-06",
  "logo": "https://cdn.jsdelivr.net/gh/zknjjjx/tvbox@main/assets/logo.png",
+ "wallpaper": "https://cdn.jsdelivr.net/gh/zknjjjx/tvbox@main/assets/wallpaper.jpg",
+ "spider": "https://xiuxiu-pro-new.meitudata.com/posters/8057468f8f30ba79c6dbbeb7fc1a052e.jpg;md5;b3fb6f369726e9c688dd5a7ad017d0dd",
  "sites": [
   {
    "key": "nn_565ddc14",
-   "name": "豆豆┃片单",
+   "name": "妞妞┃首页",
    "type": 3,
    "api": "csp_DouDouGuard",
    "indexs": 1,
@@ -4142,7 +4144,6 @@
   "mozai.4gtv.tv",
   "pv.vipwm.cc"
  ],
- "notice": "妞妞 · 297 个站点 · 每日更新 2026-11-06",
  "doh": [
   {
    "name": "Google",

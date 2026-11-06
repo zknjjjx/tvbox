@@ -221,8 +221,10 @@ async def main():
 
     # 父解析：保留一个 Web 解析在前
     import datetime
-    out = {"spider": first.get("spider", ""), "wallpaper": f"{CDN}/assets/wallpaper.jpg", "logo": f"{CDN}/assets/logo.png",
-           "sites": sites, "parses": parses, "lives": lives, "rules": rules, "flags": flags, "ads": ads,
+    if sites and "片单" in sites[0]["name"]:
+        sites[0]["name"] = f"{BRAND}┃首页"
+    out = {"name": BRAND, "notice": "", "logo": f"{CDN}/assets/logo.png", "wallpaper": f"{CDN}/assets/wallpaper.jpg",
+           "spider": first.get("spider", ""), "sites": sites, "parses": parses, "lives": lives, "rules": rules, "flags": flags, "ads": ads,
            "notice": f"{BRAND} · {len(sites)} 个站点 · 每日更新 {datetime.date.today().isoformat()}"}
     if first.get("doh"):
         out["doh"] = first["doh"]
