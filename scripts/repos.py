@@ -39,6 +39,23 @@ REPOS = [
 MERGE_TOP = int(os.environ.get("MERGE_TOP", "6"))
 
 
+BRAND = "妞妞"
+CDN = "https://cdn.jsdelivr.net/gh/zknjjjx/tvbox@main"
+SEP = re.compile(r"[┃┆|丨│｜]+")
+AD = re.compile(r"QQ|频道|公众号|微信|群|关注|禁止|贩卖|免费分享|宝贝|请勿|广告|更新|日期|^APP$|放牛娃|饭太硬|肥猫|摸鱼|南风|菜妮丝")
+# 需要登录网盘或只是设置/推送工具的站点不收
+SKIP = re.compile(r"网盘|云盘|盘搜|盘她|盘他|配置|设置|本地|推送|夸克|百度|阿里|天翼|115|PikPak|优熙|我的|媒体库|Push|Config|Local|PanSou|PanSo|YpanSo|BpanSo|Drive|Woucpan|WoBaidu", re.I)
+
+
+def clean_name(n):
+    parts = []
+    for p in SEP.split(n or ""):
+        p = re.sub(r"[^\w\u4e00-\u9fff+\-·.]", "", p).strip("._-·")
+        if p and not AD.search(p):
+            parts.append(p)
+    return parts
+
+
 # ---------- 解码：明文 / 图片尾部 base64 / 2423 开头的 AES-CBC ----------
 def _pad16(s):
     return (s + "0" * 16)[:16]
@@ -157,12 +174,15 @@ async def main():
                 s["jar"] = absu(s["jar"], base)
             elif spider and (str(s.get("type")) == "3" or str(s["api"]).startswith("csp_")):
                 s["jar"] = spider
-            sig = (s["api"], json.dumps(s.get("ext"), ensure_ascii=False, sort_keys=True), s.get("jar", ""))
-            if sig in seen_site:
+            parts = clean_name(s.get("name"))
+            if not parts or SKIP.search(s.get("name") or "") or SKIP.search(str(s["api"])):
                 continue
-            seen_site.add(sig)
+            core = parts[0]
+            if core in seen_site:  # 同名站点只留人气最高仓库的那个
+                continue
+            seen_site.add(core)
             s["key"] = f"{name}_{s.get('key') or s.get('name')}"
-            s["name"] = f"{name}┃{(s.get('name') or s['key']).strip()}"
+            s["name"] = "┃".join(parts[:2])
             sites.append(s)
         for p in d.get("parses") or []:
             if isinstance(p, dict) and p.get("url") and p["url"] not in seen_parse and not p["url"].startswith("Demo"):
@@ -177,7 +197,7 @@ async def main():
             for k in ("url", "api", "epg", "logo", "jar"):
                 if k in lv:
                     lv[k] = absu(lv[k], base)
-            lv["name"] = f"{name}┃{lv.get('name', '直播')}"
+            lv["name"] = "┃".join(clean_name(lv.get("name")) or ["直播"]) + f"·{len(lives) + 1}"
             lives.append(lv)
         rules += d.get("rules") or []
         for f in d.get("flags") or []:
@@ -192,20 +212,24 @@ async def main():
     for s in cms:
         if s.get("adult"):
             continue
-        sites.append({"key": "cn_" + hashlib.md5(s["api"].encode()).hexdigest()[:8], "name": f"采集┃{s['name']}",
+        if s["name"] in seen_site:
+            continue
+        seen_site.add(s["name"])
+        sites.append({"key": "cn_" + hashlib.md5(s["api"].encode()).hexdigest()[:8], "name": f"{s['name']}┃采集",
                       "type": 1, "api": s["api"] + "/", "searchable": 1, "quickSearch": 1, "filterable": 1})
 
     # 父解析：保留一个 Web 解析在前
-    out = {"spider": first.get("spider", ""), "wallpaper": first.get("wallpaper", ""), "logo": first.get("logo", ""),
+    import datetime
+    out = {"spider": first.get("spider", ""), "wallpaper": f"{CDN}/assets/wallpaper.jpg", "logo": f"{CDN}/assets/logo.png",
            "sites": sites, "parses": parses, "lives": lives, "rules": rules, "flags": flags, "ads": ads,
-           "notice": f"CineNest 汇聚 · {min(len(multi), MERGE_TOP)} 个热门仓库 + 采集站 · {len(sites)} 个站点"}
+           "notice": f"{BRAND} · {len(sites)} 个站点 · 每日更新 {datetime.date.today().isoformat()}"}
     if first.get("doh"):
         out["doh"] = first["doh"]
     if first.get("ijk"):
         out["ijk"] = first["ijk"]
-    json.dump(out, open(os.path.join(ROOT, "tvbox.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
-    raw = "https://raw.githubusercontent.com/zknjjjx/tvbox/main/tvbox.json"
-    json.dump({"urls": [{"name": "CineNest 汇聚", "url": raw}] + multi},
+    for fn in ("niuniu.json", "tvbox.json"):  # tvbox.json 保留同样内容，兼容旧地址
+        json.dump(out, open(os.path.join(ROOT, fn), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+    json.dump({"urls": [{"name": BRAND, "url": f"{CDN}/niuniu.json"}] + multi},
               open(os.path.join(ROOT, "multi.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     print("仓库", json.dumps(report, ensure_ascii=False))
     print("合计站点", len(sites), "解析", len(parses), "直播", len(lives))

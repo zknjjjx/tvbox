@@ -30,7 +30,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898299+github-actions[bot]@users.noreply.github.com"
-          git add cmstv.json tvbox.json multi.json upstream
+          git add cmstv.json tvbox.json niuniu.json multi.json upstream
           if git diff --cached --quiet; then echo "无变化"; exit 0; fi
           git commit -m "chore: 更新公共接口 $(date -u +%F)"
           git pull --rebase -X theirs || true
