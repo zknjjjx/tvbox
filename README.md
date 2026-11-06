@@ -1,14 +1,18 @@
 # tvbox
 
-CineNest 公共影视源接口，GitHub Actions 每天 03:30（北京时间）自动从公开列表汇集、去重。不验活：各地网络不同，CineNest 会在本地测速并自动跳过连不上的源。
+公共影视接口，GitHub Actions 每天 03:30（北京时间）自动汇集更新。不验活、不测速。
 
-- `cmstv.json`：CineNest 专用接口，在 CineNest 首页「设置」里填它的地址
-- `tvbox.json`：同一批源的 TVBox 配置（已去掉成人源）
+- `cmstv.json`：CMS 采集站汇总，按人气（被多少个公开列表收录）排序，填到 CineNest 首页「设置」
+- `tvbox.json`：电视用单仓配置，合并人气最高的几个仓库（饭太硬、肥猫、王二小、摸鱼儿、南风、菜妮丝……）的站点、解析、直播，再接上采集站（不含成人源）。站点名前缀是来源仓库
+- `multi.json`：多仓配置（影视仓等支持多仓的软件），含上面的合并版和各原始仓库，单个仓库失效时可切换
+- `upstream/`：各仓库最近一次成功拉取的明文配置，当天拉不到时用它兜底
+
+仓库清单和顺序在 `scripts/repos.py` 的 `REPOS` 里，合并几个由 `MERGE_TOP`（默认 6）决定。
 
 地址（国内可用加速或 jsDelivr）：
 
-- https://raw.githubusercontent.com/zknjjjx/tvbox/main/cmstv.json
-- https://cdn.jsdelivr.net/gh/zknjjjx/tvbox@main/cmstv.json
-- https://ghfast.top/https://raw.githubusercontent.com/zknjjjx/tvbox/main/cmstv.json
+- https://raw.githubusercontent.com/zknjjjx/tvbox/main/tvbox.json
+- https://cdn.jsdelivr.net/gh/zknjjjx/tvbox@main/tvbox.json
+- https://ghfast.top/https://raw.githubusercontent.com/zknjjjx/tvbox/main/tvbox.json
 
-TVBox 把上面的 `cmstv.json` 换成 `tvbox.json` 即可。
+把文件名换成 `multi.json` 或 `cmstv.json` 即得对应地址。
