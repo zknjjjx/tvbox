@@ -181,12 +181,13 @@ async def main():
             if core in seen_site:  # 同名站点只留人气最高仓库的那个
                 continue
             seen_site.add(core)
-            s["key"] = f"{name}_{s.get('key') or s.get('name')}"
+            s["key"] = "nn_" + hashlib.md5(f"{name}|{s.get('key') or s.get('name')}".encode()).hexdigest()[:8]
             s["name"] = "┃".join(parts[:2])
             sites.append(s)
         for p in d.get("parses") or []:
             if isinstance(p, dict) and p.get("url") and p["url"] not in seen_parse and not p["url"].startswith("Demo"):
-                seen_parse.add(p["url"]); p = dict(p); p["url"] = absu(p["url"], base); parses.append(p)
+                seen_parse.add(p["url"]); p = dict(p); p["url"] = absu(p["url"], base)
+                p["name"] = f"{BRAND}解析{len(parses) + 1}"; parses.append(p)
         for lv in d.get("lives") or []:
             if not isinstance(lv, dict):
                 continue
