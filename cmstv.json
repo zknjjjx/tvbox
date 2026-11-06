@@ -1,7 +1,7 @@
 {
  "name": "CineNest 公共接口",
  "format": "cmstv/1",
- "updated": "2026-11-06 13:43 UTC",
+ "updated": "2026-11-06 23:45 UTC",
  "count": 123,
  "note": "未验活，按人气（被多少个上游收录）排序；播放时自动跳过不通的源",
  "sites": [
