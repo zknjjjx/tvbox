@@ -16,8 +16,3 @@
 - https://ghfast.top/https://raw.githubusercontent.com/zknjjjx/tvbox/main/niuniu.json
 
 把文件名换成 `multi.json` 或 `cmstv.json` 即得对应地址。
-
-## Android APK
-
-- [下载 TVBox_debug-java.apk](https://raw.githubusercontent.com/zknjjjx/tvbox/main/apk/TVBox_debug-java.apk)（debug 构建）
-- SHA-256：`129f245bbde4042c04a09861fa975106580f26fd45d6c9cd415a23cfe2a11fd7`
